@@ -42,7 +42,8 @@ async fn main() -> Result<()> {
 
                     // Iterate through all shards and their transactions
                     for shard in &block.shards {
-                        for tx_with_outcome in &shard.chunk.transactions {
+                        let Some(chunk) = &shard.chunk else { continue; };
+                        for tx_with_outcome in &chunk.transactions {
                             let tx = &tx_with_outcome.transaction;
 
                             // Check if any action is CreateAccount
