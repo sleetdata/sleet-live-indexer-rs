@@ -2,6 +2,7 @@
 
 ```sh
 source .env
+cargo run --bin stream_blocks_print
 ```
 
 ---
