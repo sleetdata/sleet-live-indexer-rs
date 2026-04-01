@@ -1,0 +1,6 @@
+[package]
+name = "sleet-live-indexer-rs"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
