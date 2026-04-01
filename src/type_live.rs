@@ -1,8 +1,5 @@
 use near_primitives::views::{
-    ActionView,
-    BlockView,
-    ChunkView,
-    ReceiptView,
+    BlockView, ChunkView, ExecutionOutcomeWithIdView, StateChangeValueView,
 };
 // ===========================================
 // Wrapper for the SSE event structure: {"block": BlockView, "shards": [...]}
@@ -16,8 +13,8 @@ pub struct LIVE_BLOCK_EVENT {
 #[derive(serde::Deserialize, Debug)]
 pub struct LIVE_SHARD_DATA {
     pub chunk: Option<ChunkView>,
-    pub receipts: Option<Vec<ReceiptView>>,
-    pub transactions: Vec<serde_json::Value>,
+    pub receipt_execution_outcomes: Vec<ExecutionOutcomeWithIdView>,
+    pub shard_id: u64,
+    pub state_changes: Vec<StateChangeValueView>,
 }
 // ===========================================
-
