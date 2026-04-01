@@ -7,6 +7,6 @@ use near_primitives::views::{
 // Wrapper for the SSE event structure: {"block": BlockView, "shards": [...]}
 #[derive(serde::Deserialize)]
 pub struct LIVE_BLOCK_EVENT {
-    pub block_view: BlockView,
+    pub block: BlockView,
 }
 // ===========================================

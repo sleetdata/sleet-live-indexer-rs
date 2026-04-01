@@ -32,7 +32,7 @@ async fn main() -> Result<()> {
                         }
                     };
 
-                    let block = block_event.block_view;
+                    let block = block_event.block;
 
                     println!("===============================");
                     println!("Block #{}", block.header.height);
