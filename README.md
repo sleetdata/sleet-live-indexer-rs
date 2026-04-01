@@ -1,6 +1,8 @@
 # sleet-live-indexer
 indexer playground built on near-stream
 
+🚧 WIP
+
 ℹ️ this indexer playground is built around near-stream
 <br/>
 ℹ️ check it out at "https://github.com/sleetdata/near-stream"
