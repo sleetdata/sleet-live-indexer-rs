@@ -2,7 +2,6 @@ use near_primitives::views::{
     ActionView,
     BlockView,
     ChunkView,
-    ReceiptEnumView,
     ReceiptView,
 };
 // ===========================================
@@ -18,7 +17,7 @@ pub struct LIVE_BLOCK_EVENT {
 pub struct LIVE_SHARD_DATA {
     pub chunk: Option<ChunkView>,
     pub receipts: Option<Vec<ReceiptView>>,
-    pub transactions: Option<Vec<TransactionData>>,
+    pub transactions: Vec<serde_json::Value>,
 }
 // ===========================================
 
