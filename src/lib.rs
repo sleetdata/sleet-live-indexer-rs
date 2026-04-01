@@ -2,5 +2,6 @@
 #![allow(non_camel_case_types)]
 // ===========================================
 pub mod type_live;
+pub mod type_neardata;
 // ===========================================
 // copyright 2026 by sleet.near
