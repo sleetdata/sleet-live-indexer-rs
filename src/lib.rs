@@ -1,6 +1,4 @@
+// sleet_live_indexer_rs
 // ===========================================
-// main
-fn main() {
-    println!("Hello, world!");
-}
 // ===========================================
+// copyright 2026 by sleet.near
