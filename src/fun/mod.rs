@@ -1,6 +1,7 @@
 // ===========================================
 pub mod connect_to_stream_fun;
 pub mod decode_base64_args_fun;
+pub mod extract_action_info_fun;
 pub mod extract_block_info_fun;
 pub mod extract_outcome_info_fun;
 pub mod extract_shard_info_fun;

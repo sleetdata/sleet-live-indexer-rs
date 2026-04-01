@@ -1,8 +1,10 @@
 // Stream all transactions where receiver_id is "blackjack-v2.warsofcards.near"
+// Shows detailed action info including method names and decoded args for FunctionCalls
 // ==============================================
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
 use sleet_live_indexer_rs::fun::{
+    decode_base64_args_fun::decode_base64_args_fun,
     extract_block_info_fun::extract_block_info_fun,
     filter_by_receiver_fun::filter_by_receiver_fun,
     parse_block_fun::parse_block_fun,
@@ -58,7 +60,29 @@ async fn main() -> Result<()> {
                             println!("  Tx Hash: {}", tx.tx_hash);
                             println!("  Signer: {}", tx.signer_id);
                             println!("  Receiver: {}", tx.receiver_id);
-                            println!("  Actions: {}", tx.action_count);
+                            println!("  Actions: {}", tx.actions.len());
+
+                            // Print detailed action info
+                            for (j, action) in tx.actions.iter().enumerate() {
+                                println!("    [Action {}] {}", j + 1, action.action_type);
+                                
+                                if let Some(method_name) = &action.method_name {
+                                    println!("      Method: {}", method_name);
+                                }
+                                if let Some(deposit) = &action.deposit {
+                                    println!("      Deposit: {}", deposit);
+                                }
+                                if let Some(gas) = action.gas {
+                                    println!("      Gas: {}", gas);
+                                }
+                                if let Some(args) = &action.args {
+                                    // Try to decode base64 args for FunctionCalls
+                                    let decoded = decode_base64_args_fun(args)
+                                        .unwrap_or_else(|| args.clone());
+                                    println!("      Args (encoded): {}", args);
+                                    println!("      Args (decoded): {}", decoded);
+                                }
+                            }
 
                             if let Some(receipt_id) = &tx.receipt_id {
                                 println!("  Receipt ID: {}", receipt_id);

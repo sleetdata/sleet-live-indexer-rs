@@ -1,3 +1,4 @@
+use crate::fun::extract_action_info_fun::{extract_action_info_fun, ActionInfo};
 use crate::types::neardata_block_response_interface;
 // ===========================================
 
@@ -6,7 +7,7 @@ pub struct ReceiverTransaction {
     pub tx_hash: String,
     pub signer_id: String,
     pub receiver_id: String,
-    pub action_count: usize,
+    pub actions: Vec<ActionInfo>,
     pub receipt_id: Option<String>,
     pub logs: Vec<String>,
 }
@@ -41,12 +42,19 @@ pub fn filter_by_receiver_fun(
                     .as_ref()
                     .map(|r| r.receipt_id.clone());
 
+                // Extract action info for each action
+                let actions: Vec<ActionInfo> = tx
+                    .actions
+                    .iter()
+                    .map(|action| extract_action_info_fun(action))
+                    .collect();
+
                 transactions.push(ReceiverTransaction {
                     shard_id: shard.shard_id,
                     tx_hash: tx.hash.clone(),
                     signer_id: tx.signer_id.clone(),
                     receiver_id: tx.receiver_id.clone(),
-                    action_count: tx.actions.len(),
+                    actions,
                     receipt_id,
                     logs,
                 });
