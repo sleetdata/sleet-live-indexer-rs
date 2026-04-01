@@ -23,7 +23,6 @@ cargo run
 cargo check
 # cargo test
 cargo clean
-cargo check
 cargo fmt
 cargo update
 ```

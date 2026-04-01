@@ -1,6 +1,6 @@
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
-use sleet_live_indexer_rs::types::NeardataBlockResponse;
+use sleet_live_indexer_rs::types::neardata_block_response_interface;
 use std::env;
 use tokio_stream::StreamExt;
 // ===========================================
@@ -24,7 +24,7 @@ async fn main() -> Result<()> {
                 if event_type == "block" {
                     let data = ev.data;
 
-                    let block_event: NeardataBlockResponse = match serde_json::from_str(&data) {
+                    let block_event: neardata_block_response_interface = match serde_json::from_str(&data) {
                         Ok(b) => b,
                         Err(e) => {
                             eprintln!("Failed to parse block: {e}");
