@@ -24,7 +24,11 @@ async fn main() -> Result<()> {
         .with_context(|| "Failed to send HTTP request")?;
 
     if !res.status().is_success() {
-        anyhow::bail!("Failed to fetch: {} {}", res.status(), res.status().canonical_reason().unwrap_or(""));
+        anyhow::bail!(
+            "Failed to fetch: {} {}",
+            res.status(),
+            res.status().canonical_reason().unwrap_or("")
+        );
     }
 
     let json: serde_json::Value = res
@@ -34,7 +38,9 @@ async fn main() -> Result<()> {
 
     // Validate and parse into our type
     let validated: neardata_block_response_interface = serde_json::from_value(json.clone())
-        .with_context(|| "Failed to validate block data against neardata_block_response_interface schema")?;
+        .with_context(
+            || "Failed to validate block data against neardata_block_response_interface schema",
+        )?;
 
     println!("===========================================");
     println!("✓ Validation successful!");

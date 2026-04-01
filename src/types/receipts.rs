@@ -4,10 +4,7 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::transactions::{
-    neardata_action_interface,
-    neardata_data_receiver_interface,
-};
+use super::transactions::{neardata_action_interface, neardata_data_receiver_interface};
 use super::transactions_outcome_interface::neardata_execution_outcome_interface;
 
 // ===========================================

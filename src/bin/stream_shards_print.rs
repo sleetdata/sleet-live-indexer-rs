@@ -24,13 +24,14 @@ async fn main() -> Result<()> {
                 if event_type == "block" {
                     let data = ev.data;
 
-                    let block_event: neardata_block_response_interface = match serde_json::from_str(&data) {
-                        Ok(b) => b,
-                        Err(e) => {
-                            eprintln!("Failed to parse block: {e}");
-                            continue;
-                        }
-                    };
+                    let block_event: neardata_block_response_interface =
+                        match serde_json::from_str(&data) {
+                            Ok(b) => b,
+                            Err(e) => {
+                                eprintln!("Failed to parse block: {e}");
+                                continue;
+                            }
+                        };
 
                     println!("===============================");
                     println!("Block #{}", block_event.height());
@@ -53,13 +54,19 @@ async fn main() -> Result<()> {
                         println!("  Rent Paid: {}", chunk.header.rent_paid);
                         println!("  Tx Root: {}", chunk.header.tx_root);
                         println!("  Outcome Root: {}", chunk.header.outcome_root);
-                        println!("  Outgoing Receipts Root: {}", chunk.header.outgoing_receipts_root);
+                        println!(
+                            "  Outgoing Receipts Root: {}",
+                            chunk.header.outgoing_receipts_root
+                        );
                         println!("  Prev State Root: {}", chunk.header.prev_state_root);
                         println!("  Encoded Length: {}", chunk.header.encoded_length);
                         println!("  Signature: {}", chunk.header.signature);
                         println!("  Transactions: {}", chunk.transactions.len());
 
-                        println!("  Receipt Execution Outcomes: {}", shard.receipt_execution_outcomes.len());
+                        println!(
+                            "  Receipt Execution Outcomes: {}",
+                            shard.receipt_execution_outcomes.len()
+                        );
                         println!("  State Changes: {}", shard.state_changes.len());
                         println!();
                     }

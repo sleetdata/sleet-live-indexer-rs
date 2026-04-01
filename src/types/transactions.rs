@@ -4,13 +4,13 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::transactions_outcome_interface::neardata_transactions_outcome_interface;
 use super::transactions_actions_AddKey::neardata_add_key_action_interface;
 use super::transactions_actions_CreateAccount::neardata_create_account_action_interface;
 use super::transactions_actions_Delegate::neardata_delegate_action_interface;
 use super::transactions_actions_DeleteAccount::neardata_delete_account_action_interface;
 use super::transactions_actions_FunctionCall::neardata_function_call_action_interface;
 use super::transactions_actions_Transfer::neardata_transfer_action_interface;
+use super::transactions_outcome_interface::neardata_transactions_outcome_interface;
 
 // ===========================================
 // ==== neardata_transactions_interface ====
@@ -44,17 +44,29 @@ pub enum neardata_action_interface {
     /// String action (rare, for simple actions)
     String(String),
     /// CreateAccount action
-    CreateAccount { CreateAccount: neardata_create_account_action_interface },
+    CreateAccount {
+        CreateAccount: neardata_create_account_action_interface,
+    },
     /// DeleteAccount action
-    DeleteAccount { DeleteAccount: neardata_delete_account_action_interface },
+    DeleteAccount {
+        DeleteAccount: neardata_delete_account_action_interface,
+    },
     /// AddKey action
-    AddKey { AddKey: neardata_add_key_action_interface },
+    AddKey {
+        AddKey: neardata_add_key_action_interface,
+    },
     /// FunctionCall action
-    FunctionCall { FunctionCall: neardata_function_call_action_interface },
+    FunctionCall {
+        FunctionCall: neardata_function_call_action_interface,
+    },
     /// Transfer action
-    Transfer { Transfer: neardata_transfer_action_interface },
+    Transfer {
+        Transfer: neardata_transfer_action_interface,
+    },
     /// Delegate action
-    Delegate { Delegate: neardata_delegate_action_interface },
+    Delegate {
+        Delegate: neardata_delegate_action_interface,
+    },
 }
 
 // ===========================================
