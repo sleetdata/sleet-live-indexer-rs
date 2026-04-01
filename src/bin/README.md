@@ -21,8 +21,9 @@ cargo run --bin stream_tx_actions_deleteaccount_print
 cargo run --bin stream_tx_actions_functioncall_print
 cargo run --bin stream_tx_actions_transfer_print
 
-# functioncall
+# functioncall/other
 cargo run --bin stream_tx_functioncall_create_account
+cargo run --bin stream_tx_receiver_blackjack
 ```
 
 ---
