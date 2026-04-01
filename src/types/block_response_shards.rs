@@ -12,7 +12,7 @@ use super::transactions::neardata_transactions_interface;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct neardata_shard_interface {
     pub shard_id: u64,
-    pub chunk: neardata_shard_chunk_interface,
+    pub chunk: Option<neardata_shard_chunk_interface>,
     pub receipt_execution_outcomes: Vec<neardata_receipt_execution_outcome_interface>,
     pub state_changes: Vec<neardata_state_change_interface>,
 }

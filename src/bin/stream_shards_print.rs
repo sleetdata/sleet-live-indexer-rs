@@ -43,31 +43,34 @@ async fn main() -> Result<()> {
                     for shard in &block_event.shards {
                         println!("--- Shard #{} ---", shard.shard_id);
 
-                        let chunk = &shard.chunk;
-                        println!("  Chunk Hash: {}", chunk.header.chunk_hash);
-                        println!("  Height Created: {}", chunk.header.height_created);
-                        println!("  Height Included: {}", chunk.header.height_included);
-                        println!("  Gas Used: {}", chunk.header.gas_used);
-                        println!("  Gas Limit: {}", chunk.header.gas_limit);
-                        println!("  Balance Burnt: {}", chunk.header.balance_burnt);
-                        println!("  Validator Reward: {}", chunk.header.validator_reward);
-                        println!("  Rent Paid: {}", chunk.header.rent_paid);
-                        println!("  Tx Root: {}", chunk.header.tx_root);
-                        println!("  Outcome Root: {}", chunk.header.outcome_root);
-                        println!(
-                            "  Outgoing Receipts Root: {}",
-                            chunk.header.outgoing_receipts_root
-                        );
-                        println!("  Prev State Root: {}", chunk.header.prev_state_root);
-                        println!("  Encoded Length: {}", chunk.header.encoded_length);
-                        println!("  Signature: {}", chunk.header.signature);
-                        println!("  Transactions: {}", chunk.transactions.len());
+                        if let Some(chunk) = &shard.chunk {
+                            println!("  Chunk Hash: {}", chunk.header.chunk_hash);
+                            println!("  Height Created: {}", chunk.header.height_created);
+                            println!("  Height Included: {}", chunk.header.height_included);
+                            println!("  Gas Used: {}", chunk.header.gas_used);
+                            println!("  Gas Limit: {}", chunk.header.gas_limit);
+                            println!("  Balance Burnt: {}", chunk.header.balance_burnt);
+                            println!("  Validator Reward: {}", chunk.header.validator_reward);
+                            println!("  Rent Paid: {}", chunk.header.rent_paid);
+                            println!("  Tx Root: {}", chunk.header.tx_root);
+                            println!("  Outcome Root: {}", chunk.header.outcome_root);
+                            println!(
+                                "  Outgoing Receipts Root: {}",
+                                chunk.header.outgoing_receipts_root
+                            );
+                            println!("  Prev State Root: {}", chunk.header.prev_state_root);
+                            println!("  Encoded Length: {}", chunk.header.encoded_length);
+                            println!("  Signature: {}", chunk.header.signature);
+                            println!("  Transactions: {}", chunk.transactions.len());
 
-                        println!(
-                            "  Receipt Execution Outcomes: {}",
-                            shard.receipt_execution_outcomes.len()
-                        );
-                        println!("  State Changes: {}", shard.state_changes.len());
+                            println!(
+                                "  Receipt Execution Outcomes: {}",
+                                shard.receipt_execution_outcomes.len()
+                            );
+                            println!("  State Changes: {}", shard.state_changes.len());
+                        } else {
+                            println!("  Chunk: None (empty shard)");
+                        }
                         println!();
                     }
                 }

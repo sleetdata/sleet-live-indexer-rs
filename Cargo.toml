@@ -17,6 +17,8 @@ tokio-stream = "0.1.18"
 reqwest = { version = "0.12", features = ["json"] }
 # Base64 decoding for transaction args
 base64 = "0.22"
+# Timestamps for error logging
+chrono = { version = "0.4", features = ["serde"] }
 # ===========================================
 # ===========================================
 # copyright 2026 by sleet.near
