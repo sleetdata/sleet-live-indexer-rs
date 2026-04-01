@@ -24,6 +24,10 @@ cargo run --bin stream_tx_actions_transfer_print
 # functioncall/other
 cargo run --bin stream_tx_functioncall_create_account
 cargo run --bin stream_tx_receiver_blackjack
+
+# discord webhooks
+export BLACKJACK_WS=""
+cargo run --bin stream_tx_discord_blackjack
 ```
 
 ---
