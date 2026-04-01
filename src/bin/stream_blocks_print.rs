@@ -1,18 +1,11 @@
-use std::env;
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
-use near_primitives::views::BlockView;
+use sleet_live_indexer_rs::type_live::LIVE_BLOCK_EVENT;
+use std::env;
 use tokio_stream::StreamExt;
 // ===========================================
 const DEFAULT_NEAR_STREAM_URL: &str = "http://localhost:8080";
 // ===========================================
-
-// Wrapper for the SSE event structure: {"block": BlockView, "shards": [...]}
-#[derive(serde::Deserialize)]
-struct BlockEvent {
-    block: BlockView,
-}
-
 // main
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -31,7 +24,7 @@ async fn main() -> Result<()> {
                 if event_type == "block" {
                     let data = ev.data;
 
-                    let block_event: BlockEvent = match serde_json::from_str(&data) {
+                    let block_event: LIVE_BLOCK_EVENT = match serde_json::from_str(&data) {
                         Ok(b) => b,
                         Err(e) => {
                             eprintln!("Failed to parse BlockView: {e}");
@@ -39,7 +32,7 @@ async fn main() -> Result<()> {
                         }
                     };
 
-                    let block = block_event.block;
+                    let block = block_event.block_view;
 
                     println!("===============================");
                     println!("Block #{}", block.header.height);
