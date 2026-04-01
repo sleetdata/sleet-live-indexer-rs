@@ -3,10 +3,13 @@
 // ==============================================
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
-use sleet_live_indexer_rs::types::neardata_block_response_interface;
+use sleet_live_indexer_rs::fun::{
+    log_error_fun::log_error_fun,
+    parse_block_fun::parse_block_fun,
+    print_block_stats_fun::print_block_stats_fun,
+    save_failed_block_fun::save_failed_block_fun,
+};
 use std::env;
-use std::fs::OpenOptions;
-use std::io::Write;
 use tokio_stream::StreamExt;
 // ==============================================
 const DEFAULT_NEAR_STREAM_URL: &str = "http://localhost:8080";
@@ -47,7 +50,7 @@ async fn main() -> Result<()> {
                         Ok(v) => v,
                         Err(e) => {
                             failed_blocks += 1;
-                            log_error(ERROR_LOG_FILE, FAILED_BLOCK_DIR, &data, &format!("Raw JSON parse error: {}", e), total_blocks)?;
+                            log_error_fun(ERROR_LOG_FILE, &data, &format!("Raw JSON parse error: {}", e), total_blocks)?;
                             continue;
                         }
                     };
@@ -59,29 +62,35 @@ async fn main() -> Result<()> {
                         .and_then(|h| h.as_u64())
                         .unwrap_or(0);
 
-                    // Try to parse as typed structure
-                    match serde_json::from_str::<neardata_block_response_interface>(&data) {
-                        Ok(block) => {
+                    // Try to parse as typed structure using reusable function
+                    match parse_block_fun(&data) {
+                        Ok(_block) => {
                             successful_blocks += 1;
-                            println!("✓ Block #{} - {} shards", block.height(), block.shard_count());
+                            println!("✓ Block #{} - {} shards", block_height, _block.shard_count());
                         }
                         Err(e) => {
                             failed_blocks += 1;
                             let error_msg = format!("Type parse error: {}", e);
-                            log_error(ERROR_LOG_FILE, FAILED_BLOCK_DIR, &data, &error_msg, total_blocks)?;
-                            eprintln!("✗ Block #{} - {}", block_height, error_msg);
+                            log_error_fun(ERROR_LOG_FILE, &data, &error_msg, total_blocks)?;
+                            
+                            // Save failed block using reusable function
+                            if let Some(height) = raw
+                                .get("block")
+                                .and_then(|b| b.get("header"))
+                                .and_then(|h| h.get("height"))
+                                .and_then(|h| h.as_u64())
+                            {
+                                let filename = save_failed_block_fun(FAILED_BLOCK_DIR, height, &data)?;
+                                eprintln!("✗ Block #{} - {} (saved to: {})", block_height, error_msg, filename);
+                            } else {
+                                eprintln!("✗ Block #{} - {}", block_height, error_msg);
+                            }
                         }
                     }
 
-                    // Print stats every 50 blocks
+                    // Print stats every 50 blocks using reusable function
                     if total_blocks % 50 == 0 {
-                        println!("\n=== Stats ===");
-                        println!("Total: {} | Success: {} | Failed: {} | Error Rate: {:.2}%\n",
-                            total_blocks,
-                            successful_blocks,
-                            failed_blocks,
-                            (failed_blocks as f64 / total_blocks as f64) * 100.0
-                        );
+                        print_block_stats_fun(total_blocks, successful_blocks, failed_blocks);
                     }
                 }
             }
@@ -92,45 +101,6 @@ async fn main() -> Result<()> {
             }
         }
     }
-
-    Ok(())
-}
-
-// Log error to file and save failed block JSON
-fn log_error(
-    log_file: &str,
-    failed_dir: &str,
-    block_data: &str,
-    error_msg: &str,
-    block_num: u64,
-) -> Result<()> {
-    // Append to error log
-    let mut log = OpenOptions::new()
-        .create(true)
-        .append(true)
-        .open(log_file)?;
-
-    writeln!(log, "\n=== Block #{} ===", block_num)?;
-    writeln!(log, "Error: {}", error_msg)?;
-    writeln!(log, "Timestamp: {}", chrono::Utc::now().to_rfc3339())?;
-
-    // Extract block height if possible
-    if let Ok(raw) = serde_json::from_str::<serde_json::Value>(block_data) {
-        if let Some(height) = raw
-            .get("block")
-            .and_then(|b| b.get("header"))
-            .and_then(|h| h.get("height"))
-        {
-            writeln!(log, "Block Height: {}", height)?;
-
-            // Save full JSON to file
-            let filename = format!("{}/block_{}_error.json", failed_dir, height);
-            std::fs::write(&filename, block_data)?;
-            writeln!(log, "Saved to: {}", filename)?;
-        }
-    }
-
-    writeln!(log, "----------------------------------------")?;
 
     Ok(())
 }

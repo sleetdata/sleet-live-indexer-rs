@@ -2,8 +2,10 @@
 // ==============================================
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
-use sleet_live_indexer_rs::types::{
-    neardata_action_interface, neardata_block_response_interface,
+use sleet_live_indexer_rs::fun::{
+    extract_block_info_fun::extract_block_info_fun,
+    filter_deleteaccount_actions_fun::filter_deleteaccount_actions_fun,
+    parse_block_fun::parse_block_fun,
 };
 use std::env;
 use tokio_stream::StreamExt;
@@ -29,69 +31,51 @@ async fn main() -> Result<()> {
                 if event_type == "block" {
                     let data = ev.data;
 
-                    let block: neardata_block_response_interface =
-                        match serde_json::from_str(&data) {
-                            Ok(b) => b,
-                            Err(e) => {
-                                eprintln!("Failed to parse block: {e}");
-                                continue;
+                    // Parse block using reusable function
+                    let block = match parse_block_fun(&data) {
+                        Ok(b) => b,
+                        Err(e) => {
+                            eprintln!("Failed to parse block: {e}");
+                            continue;
+                        }
+                    };
+
+                    // Extract block info using reusable function
+                    let block_info = extract_block_info_fun(&block);
+
+                    // Filter DeleteAccount actions using reusable function
+                    let delete_accounts = filter_deleteaccount_actions_fun(&block);
+
+                    if !delete_accounts.is_empty() {
+                        println!("===========================================");
+                        println!("Block #{} | Author: {}", block_info.height, block_info.author);
+                        println!("===========================================");
+
+                        for (i, delete_account) in delete_accounts.iter().enumerate() {
+                            println!("\n[DeleteAccount #{}]", i + 1);
+                            println!("  Shard: {}", delete_account.shard_id);
+                            println!("  Tx Hash: {}", delete_account.tx_hash);
+                            println!("  Signer: {}", delete_account.signer_id);
+                            println!("  Receiver: {}", delete_account.receiver_id);
+                            println!("  Public Key: {}", delete_account.public_key);
+                            println!("  Nonce: {}", delete_account.nonce);
+                            println!("  Priority Fee: {}", delete_account.priority_fee);
+                            println!("  Signature: {}", delete_account.signature);
+                            println!("  Beneficiary: {}", delete_account.beneficiary_id);
+
+                            if let Some(receipt_id) = &delete_account.receipt_id {
+                                println!("  Receipt ID: {}", receipt_id);
                             }
-                        };
 
-                    let mut deleteaccount_count = 0;
-
-                    // Iterate through all shards and their transactions
-                    for shard in &block.shards {
-                        let Some(chunk) = &shard.chunk else { continue; };
-                        for tx_with_outcome in &chunk.transactions {
-                            let tx = &tx_with_outcome.transaction;
-
-                            // Check if any action is DeleteAccount
-                            for action in &tx.actions {
-                                if matches!(action, neardata_action_interface::DeleteAccount { .. }) {
-                                    if deleteaccount_count == 0 {
-                                        println!("===========================================");
-                                        println!("Block #{} | Author: {}", block.height(), block.author());
-                                        println!("===========================================");
-                                    }
-
-                                    deleteaccount_count += 1;
-
-                                    println!("\n[DeleteAccount #{}]", deleteaccount_count);
-                                    println!("  Shard: {}", shard.shard_id);
-                                    println!("  Tx Hash: {}", tx.hash);
-                                    println!("  Signer: {}", tx.signer_id);
-                                    println!("  Receiver: {}", tx.receiver_id);
-                                    println!("  Public Key: {}", tx.public_key);
-                                    println!("  Nonce: {}", tx.nonce);
-                                    println!("  Priority Fee: {}", tx.priority_fee);
-                                    println!("  Signature: {}", tx.signature);
-
-                                    // Extract beneficiary_id from DeleteAccount action
-                                    if let neardata_action_interface::DeleteAccount { DeleteAccount } = action {
-                                        println!("  Beneficiary: {}", DeleteAccount.beneficiary_id);
-                                    }
-
-                                    // Print outcome if available
-                                    if let Some(receipt) = &tx_with_outcome.outcome.receipt {
-                                        println!("  Receipt ID: {}", receipt.receipt_id);
-                                    }
-
-                                    // Print logs from outcome
-                                    let outcome = &tx_with_outcome.outcome.execution_outcome.outcome;
-                                    if !outcome.logs.is_empty() {
-                                        println!("  Logs:");
-                                        for log in &outcome.logs {
-                                            println!("    - {}", log);
-                                        }
-                                    }
+                            if !delete_account.logs.is_empty() {
+                                println!("  Logs:");
+                                for log in &delete_account.logs {
+                                    println!("    - {}", log);
                                 }
                             }
                         }
-                    }
 
-                    if deleteaccount_count > 0 {
-                        println!("\n>>> Total DeleteAccount txs in this block: {}\n", deleteaccount_count);
+                        println!("\n>>> Total DeleteAccount txs in this block: {}\n", delete_accounts.len());
                     }
                 }
             }

@@ -2,8 +2,10 @@
 // ==============================================
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
-use sleet_live_indexer_rs::types::{
-    neardata_action_interface, neardata_block_response_interface,
+use sleet_live_indexer_rs::fun::{
+    extract_block_info_fun::extract_block_info_fun,
+    filter_transfer_actions_fun::filter_transfer_actions_fun,
+    parse_block_fun::parse_block_fun,
 };
 use std::env;
 use tokio_stream::StreamExt;
@@ -29,61 +31,47 @@ async fn main() -> Result<()> {
                 if event_type == "block" {
                     let data = ev.data;
 
-                    let block: neardata_block_response_interface =
-                        match serde_json::from_str(&data) {
-                            Ok(b) => b,
-                            Err(e) => {
-                                eprintln!("Failed to parse block: {e}");
-                                continue;
+                    // Parse block using reusable function
+                    let block = match parse_block_fun(&data) {
+                        Ok(b) => b,
+                        Err(e) => {
+                            eprintln!("Failed to parse block: {e}");
+                            continue;
+                        }
+                    };
+
+                    // Extract block info using reusable function
+                    let block_info = extract_block_info_fun(&block);
+
+                    // Filter transfer actions using reusable function
+                    let transfers = filter_transfer_actions_fun(&block);
+
+                    if !transfers.is_empty() {
+                        println!("===========================================");
+                        println!("Block #{} | Author: {}", block_info.height, block_info.author);
+                        println!("===========================================");
+
+                        for (i, transfer) in transfers.iter().enumerate() {
+                            println!("\n[Transfer #{}]", i + 1);
+                            println!("  Shard: {}", transfer.shard_id);
+                            println!("  Tx Hash: {}", transfer.tx_hash);
+                            println!("  Signer: {}", transfer.signer_id);
+                            println!("  Receiver: {}", transfer.receiver_id);
+                            println!("  Deposit: {} yoctoNEAR", transfer.deposit);
+
+                            if let Some(receipt_id) = &transfer.receipt_id {
+                                println!("  Receipt ID: {}", receipt_id);
                             }
-                        };
 
-                    let mut transfer_count = 0;
-
-                    // Iterate through all shards and their transactions
-                    for shard in &block.shards {
-                        let Some(chunk) = &shard.chunk else { continue; };
-                        for tx_with_outcome in &chunk.transactions {
-                            let tx = &tx_with_outcome.transaction;
-
-                            // Check if any action is Transfer
-                            for action in &tx.actions {
-                                if let neardata_action_interface::Transfer { Transfer } = action {
-                                    if transfer_count == 0 {
-                                        println!("===========================================");
-                                        println!("Block #{} | Author: {}", block.height(), block.author());
-                                        println!("===========================================");
-                                    }
-
-                                    transfer_count += 1;
-
-                                    println!("\n[Transfer #{}]", transfer_count);
-                                    println!("  Shard: {}", shard.shard_id);
-                                    println!("  Tx Hash: {}", tx.hash);
-                                    println!("  Signer: {}", tx.signer_id);
-                                    println!("  Receiver: {}", tx.receiver_id);
-                                    println!("  Deposit: {} yoctoNEAR", Transfer.deposit);
-
-                                    // Print outcome if available
-                                    if let Some(receipt) = &tx_with_outcome.outcome.receipt {
-                                        println!("  Receipt ID: {}", receipt.receipt_id);
-                                    }
-
-                                    // Print logs from outcome
-                                    let outcome = &tx_with_outcome.outcome.execution_outcome.outcome;
-                                    if !outcome.logs.is_empty() {
-                                        println!("  Logs:");
-                                        for log in &outcome.logs {
-                                            println!("    - {}", log);
-                                        }
-                                    }
+                            if !transfer.logs.is_empty() {
+                                println!("  Logs:");
+                                for log in &transfer.logs {
+                                    println!("    - {}", log);
                                 }
                             }
                         }
-                    }
 
-                    if transfer_count > 0 {
-                        println!("\n>>> Total Transfer txs in this block: {}\n", transfer_count);
+                        println!("\n>>> Total Transfer txs in this block: {}\n", transfers.len());
                     }
                 }
             }
