@@ -15,6 +15,8 @@ eventsource-client = "0.13"
 tokio-stream = "0.1.18"
 # HTTP client
 reqwest = { version = "0.12", features = ["json"] }
+# Base64 decoding for transaction args
+base64 = "0.22"
 # ===========================================
 # ===========================================
 # copyright 2026 by sleet.near
