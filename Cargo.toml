@@ -4,7 +4,15 @@ version = "0.1.0"
 edition = "2024"
 # ===========================================
 [dependencies]
-
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+anyhow = "1"
+# NEAR official primitives
+near-primitives = "0.24.0"
+# SSE client
+eventsource-client = "0.13"
+tokio-stream = "0.1.18"
 # ===========================================
 # ===========================================
 # copyright 2026 by sleet.near

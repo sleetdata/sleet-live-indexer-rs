@@ -28,6 +28,7 @@ cargo fmt
 cargo update
 ```
 
+bins see [src/bin/README.md](./src/bin/README.md)
 
 ---
 
