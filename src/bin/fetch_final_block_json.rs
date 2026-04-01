@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use sleet_live_indexer_rs::type_neardata::NEARDATA_BLOCK_RESPONSE;
+use sleet_live_indexer_rs::types::NeardataBlockResponse;
 use std::fs;
 use std::path::Path;
 // ===========================================
@@ -33,15 +33,15 @@ async fn main() -> Result<()> {
         .with_context(|| "Failed to parse JSON response")?;
 
     // Validate and parse into our type
-    let validated: NEARDATA_BLOCK_RESPONSE = serde_json::from_value(json.clone())
-        .with_context(|| "Failed to validate block data against NEARDATA_BLOCK_RESPONSE schema")?;
+    let validated: NeardataBlockResponse = serde_json::from_value(json.clone())
+        .with_context(|| "Failed to validate block data against NeardataBlockResponse schema")?;
 
     println!("===========================================");
     println!("✓ Validation successful!");
-    println!("  Block height: {}", validated.block.header.height);
-    println!("  Author: {}", validated.block.author);
-    println!("  Hash: {}", validated.block.header.hash);
-    println!("  Chunks: {}", validated.block.chunks.len());
+    println!("  Block height: {}", validated.height());
+    println!("  Author: {}", validated.author());
+    println!("  Hash: {}", validated.hash());
+    println!("  Shards: {}", validated.shard_count());
     println!("===========================================");
 
     // Write raw JSON to file

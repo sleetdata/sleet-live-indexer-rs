@@ -1,6 +1,6 @@
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
-use sleet_live_indexer_rs::type_stream::STREAM_BLOCK_EVENT;
+use sleet_live_indexer_rs::types::NeardataBlockResponse;
 use std::env;
 use tokio_stream::StreamExt;
 // ===========================================
@@ -24,22 +24,19 @@ async fn main() -> Result<()> {
                 if event_type == "block" {
                     let data = ev.data;
 
-                    let block_event: STREAM_BLOCK_EVENT = match serde_json::from_str(&data) {
+                    let block_event: NeardataBlockResponse = match serde_json::from_str(&data) {
                         Ok(b) => b,
                         Err(e) => {
-                            eprintln!("Failed to parse BlockView: {e}");
+                            eprintln!("Failed to parse block: {e}");
                             continue;
                         }
                     };
 
-                    let block = block_event.block;
-
                     println!("===============================");
-                    println!("Block #{}", block.header.height);
-                    println!("Author: {}", block.author);
-                    println!("Hash: {}", block.header.hash);
-                    println!("Prev: {}", block.header.prev_hash);
-                    println!("Shards: {}", block_event.shards.len());
+                    println!("Block #{}", block_event.height());
+                    println!("Author: {}", block_event.author());
+                    println!("Hash: {}", block_event.hash());
+                    println!("Shards: {}", block_event.shard_count());
                     println!("===============================");
                 }
             }

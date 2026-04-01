@@ -1,6 +1,6 @@
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
-use sleet_live_indexer_rs::type_stream::STREAM_BLOCK_EVENT;
+use sleet_live_indexer_rs::types::NeardataBlockResponse;
 use std::env;
 use tokio_stream::StreamExt;
 // ===========================================
@@ -24,45 +24,40 @@ async fn main() -> Result<()> {
                 if event_type == "block" {
                     let data = ev.data;
 
-                    let block_event: STREAM_BLOCK_EVENT = match serde_json::from_str(&data) {
+                    let block_event: NeardataBlockResponse = match serde_json::from_str(&data) {
                         Ok(b) => b,
                         Err(e) => {
-                            eprintln!("Failed to parse BlockView: {e}");
+                            eprintln!("Failed to parse block: {e}");
                             continue;
                         }
                     };
 
-                    let block = block_event.block;
-
                     println!("===============================");
-                    println!("Block #{}", block.header.height);
-                    println!("Author: {}", block.author);
-                    println!("Hash: {}", block.header.hash);
-                    println!("Shards: {}", block_event.shards.len());
+                    println!("Block #{}", block_event.height());
+                    println!("Author: {}", block_event.author());
+                    println!("Hash: {}", block_event.hash());
+                    println!("Shards: {}", block_event.shard_count());
                     println!("===============================");
 
-                    for shard in block_event.shards {
+                    for shard in &block_event.shards {
                         println!("--- Shard #{} ---", shard.shard_id);
-                        
-                        if let Some(chunk) = &shard.chunk {
-                            println!("  Chunk Hash: {}", chunk.header.chunk_hash);
-                            println!("  Height Created: {}", chunk.header.height_created);
-                            println!("  Height Included: {}", chunk.header.height_included);
-                            println!("  Gas Used: {}", chunk.header.gas_used);
-                            println!("  Gas Limit: {}", chunk.header.gas_limit);
-                            println!("  Balance Burnt: {}", chunk.header.balance_burnt);
-                            println!("  Validator Reward: {}", chunk.header.validator_reward);
-                            println!("  Rent Paid: {}", chunk.header.rent_paid);
-                            println!("  Tx Root: {}", chunk.header.tx_root);
-                            println!("  Outcome Root: {}", chunk.header.outcome_root);
-                            println!("  Outgoing Receipts Root: {}", chunk.header.outgoing_receipts_root);
-                            println!("  Prev State Root: {}", chunk.header.prev_state_root);
-                            println!("  Encoded Length: {}", chunk.header.encoded_length);
-                            println!("  Signature: {}", chunk.header.signature);
-                            println!("  Transactions: {}", chunk.transactions.len());
-                        } else {
-                            println!("  Chunk: None");
-                        }
+
+                        let chunk = &shard.chunk;
+                        println!("  Chunk Hash: {}", chunk.header.chunk_hash);
+                        println!("  Height Created: {}", chunk.header.height_created);
+                        println!("  Height Included: {}", chunk.header.height_included);
+                        println!("  Gas Used: {}", chunk.header.gas_used);
+                        println!("  Gas Limit: {}", chunk.header.gas_limit);
+                        println!("  Balance Burnt: {}", chunk.header.balance_burnt);
+                        println!("  Validator Reward: {}", chunk.header.validator_reward);
+                        println!("  Rent Paid: {}", chunk.header.rent_paid);
+                        println!("  Tx Root: {}", chunk.header.tx_root);
+                        println!("  Outcome Root: {}", chunk.header.outcome_root);
+                        println!("  Outgoing Receipts Root: {}", chunk.header.outgoing_receipts_root);
+                        println!("  Prev State Root: {}", chunk.header.prev_state_root);
+                        println!("  Encoded Length: {}", chunk.header.encoded_length);
+                        println!("  Signature: {}", chunk.header.signature);
+                        println!("  Transactions: {}", chunk.transactions.len());
 
                         println!("  Receipt Execution Outcomes: {}", shard.receipt_execution_outcomes.len());
                         println!("  State Changes: {}", shard.state_changes.len());
