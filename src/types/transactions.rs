@@ -38,6 +38,7 @@ pub struct neardata_transactions_transaction_interface {
 // ==== neardata_action_interface ====
 /// Actions are objects with a single PascalCase key
 /// Example: {"Delegate": {...}} or {"FunctionCall": {...}}
+/// Unknown action types are captured in the Any variant
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum neardata_action_interface {
@@ -67,6 +68,9 @@ pub enum neardata_action_interface {
     Delegate {
         Delegate: neardata_delegate_action_interface,
     },
+    /// Catch-all for any other action type (DeleteKey, Stake, DeployContract, etc.)
+    /// This matches any object with a single PascalCase key
+    Any(serde_json::Value),
 }
 
 // ===========================================
