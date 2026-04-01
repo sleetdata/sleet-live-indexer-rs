@@ -1,7 +1,6 @@
 use near_primitives::views::{
     BlockView,
-    // ChunkHeaderView,
-    // BlockHeaderView,
+    // ChunkView,
 };
 // ===========================================
 // Wrapper for the SSE event structure: {"block": BlockView, "shards": [...]}
