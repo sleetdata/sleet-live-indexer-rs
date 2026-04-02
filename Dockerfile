@@ -1,7 +1,6 @@
 # Cargo chef stage for dependency caching
-FROM rust:1.94-slim AS chef
+FROM lukemathwalker/cargo-chef:latest-rust-1.94-slim AS chef
 WORKDIR /app
-RUN cargo install cargo-chef --locked
 
 # Planner stage
 FROM chef AS planner
@@ -12,12 +11,6 @@ RUN cargo chef prepare --recipe-path recipe.json
 # Builder stage
 FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
-
-# Install build dependencies
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    pkg-config \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
 
 # Cook dependencies (cached layer)
 RUN cargo chef cook --release --recipe-path recipe.json
