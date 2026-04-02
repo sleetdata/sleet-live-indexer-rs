@@ -26,7 +26,7 @@ cargo run --bin stream_tx_functioncall_create_account
 cargo run --bin stream_tx_receiver_blackjack
 
 # discord webhooks
-export BLACKJACK_WS=""
+export DISCORD_WEBHOOK_URL_BLACKJACK=""
 cargo run --bin stream_tx_discord_blackjack
 ```
 

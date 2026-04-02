@@ -1,5 +1,5 @@
 // Stream blackjack transactions and send them to Discord webhook
-// Requires BLACKJACK_WS environment variable
+// Requires DISCORD_WEBHOOK_URL_BLACKJACK environment variable
 // ==============================================
 use anyhow::Result;
 use eventsource_client::{Client as _, ClientBuilder, SSE};
@@ -20,8 +20,8 @@ const TARGET_RECEIVER: &str = "blackjack-v2.warsofcards.near";
 #[tokio::main]
 async fn main() -> Result<()> {
     let url = env::var("NEAR_STREAM_URL").unwrap_or_else(|_| DEFAULT_NEAR_STREAM_URL.to_string());
-    let webhook_url = env::var("BLACKJACK_WS")
-        .expect("BLACKJACK_WS environment variable must be set");
+    let webhook_url = env::var("DISCORD_WEBHOOK_URL_BLACKJACK")
+        .expect("DISCORD_WEBHOOK_URL_BLACKJACK environment variable must be set");
 
     println!("Connecting to NEAR Stream: {url}");
     println!("Filtering for receiver: {}", TARGET_RECEIVER);
