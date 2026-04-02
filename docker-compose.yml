@@ -3,6 +3,7 @@ services:
     build: .
     container_name: sleet-blackjack
     restart: unless-stopped
+    command: ["./stream_tx_discord_blackjack"]
     environment:
       - NEAR_STREAM_URL=${NEAR_STREAM_URL:-http://host.docker.internal:8080}
       - DISCORD_WEBHOOK_URL_BLACKJACK=${DISCORD_WEBHOOK_URL_BLACKJACK}
@@ -15,6 +16,7 @@ services:
     build: .
     container_name: sleet-deleteaccount
     restart: unless-stopped
+    command: ["./stream_tx_discord_deleteaccount"]
     environment:
       - NEAR_STREAM_URL=${NEAR_STREAM_URL:-http://host.docker.internal:8080}
       - DISCORD_WEBHOOK_URL_DELETEACCOUNT=${DISCORD_WEBHOOK_URL_DELETEACCOUNT}

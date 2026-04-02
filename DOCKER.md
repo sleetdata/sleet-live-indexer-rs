@@ -7,10 +7,17 @@
 git clone <repo-url> sleet-live-indexer-rs
 cd sleet-live-indexer-rs
 
-# 2. Copy and configure environment
+# 2a. Option A: For Docker (plain KEY=value format)
+cp .env.docker .env
+# Edit .env and set your webhook URLs
+
+# 2b. Option B: For shell sourcing (export format)
 cp .env.example .env
 # Edit .env and set your webhook URLs
-source .env
+source .env  # For running binaries locally
+```
+
+Docker Compose automatically reads `.env` from the project directory.
 
 # 3. Build and start both services
 docker compose up -d --build
