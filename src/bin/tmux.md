@@ -12,6 +12,12 @@ tmux new -s stream_tx_discord_blackjack
 tmux attach -t stream_tx_discord_blackjack
 export DISCORD_WEBHOOK_URL_BLACKJACK=""
 cargo run --bin stream_tx_discord_blackjack
+
+# delete account notifications (SQLite + Discord)
+tmux new -s stream_tx_discord_deleteaccount
+tmux attach -t stream_tx_discord_deleteaccount
+export DISCORD_WEBHOOK_URL_DELETEACCOUNT=""
+cargo run --bin stream_tx_discord_deleteaccount
 ```
 
 

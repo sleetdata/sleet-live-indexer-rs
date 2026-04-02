@@ -19,6 +19,8 @@ reqwest = { version = "0.12", features = ["json"] }
 base64 = "0.22"
 # Timestamps for error logging
 chrono = { version = "0.4", features = ["serde"] }
+# SQLite database
+rusqlite = { version = "0.31", features = ["bundled"] }
 # ===========================================
 # ===========================================
 # copyright 2026 by sleet.near

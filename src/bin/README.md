@@ -28,6 +28,10 @@ cargo run --bin stream_tx_receiver_blackjack
 # discord webhooks
 export DISCORD_WEBHOOK_URL_BLACKJACK=""
 cargo run --bin stream_tx_discord_blackjack
+
+# delete account notifications (SQLite + Discord)
+export DISCORD_WEBHOOK_URL_DELETEACCOUNT=""
+cargo run --bin stream_tx_discord_deleteaccount
 ```
 
 ---
