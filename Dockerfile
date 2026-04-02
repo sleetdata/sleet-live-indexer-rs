@@ -1,13 +1,26 @@
-# Build stage
-FROM rust:1.94-slim AS builder
-
+# Cargo chef stage for dependency caching
+FROM rust:1.94-slim AS chef
 WORKDIR /app
+RUN cargo install cargo-chef --locked
+
+# Planner stage
+FROM chef AS planner
+COPY Cargo.toml Cargo.lock ./
+COPY src ./src
+RUN cargo chef prepare --recipe-path recipe.json
+
+# Builder stage
+FROM chef AS builder
+COPY --from=planner /app/recipe.json recipe.json
 
 # Install build dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     pkg-config \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
+
+# Cook dependencies (cached layer)
+RUN cargo chef cook --release --recipe-path recipe.json
 
 # Copy manifests
 COPY Cargo.toml Cargo.lock ./
@@ -29,12 +42,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy built binaries from builder
-COPY --from=builder /app/target/release/stream_tx_discord_blackjack .
-COPY --from=builder /app/target/release/stream_tx_discord_deleteaccount .
+# Copy all built binaries from builder
+COPY --from=builder /app/target/release/ ./bin/
 
 # Create temp directory for SQLite database
 RUN mkdir -p ./temp
 
 # Default command (can be overridden by docker-compose)
-CMD ["./stream_tx_discord_blackjack"]
+CMD ["./bin/stream_tx_discord_blackjack"]

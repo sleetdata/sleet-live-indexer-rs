@@ -1,3 +1,4 @@
+use crate::fun::decode_base64_args_fun::decode_base64_args_fun;
 use crate::fun::filter_by_receiver_fun::ReceiverTransaction;
 use crate::fun::send_discord_webhook_fun::{DiscordEmbed, DiscordEmbedField};
 // ===========================================
@@ -66,6 +67,18 @@ pub fn format_blackjack_tx_for_discord_fun(
                     inline: true,
                 });
             }
+            // Deserialize and include args
+            if let Some(args) = &action.args {
+                if let Some(decoded_args) = decode_base64_args_fun(args) {
+                    // Format args as pretty JSON if possible, otherwise raw string
+                    let formatted_args = format_json_for_display(&decoded_args);
+                    fields.push(DiscordEmbedField {
+                        name: "📦 Args".to_string(),
+                        value: format!("```json\n{}```", formatted_args),
+                        inline: false,
+                    });
+                }
+            }
         }
     }
 
@@ -119,5 +132,20 @@ fn yocto_to_near(yocto: &str) -> String {
             }
         })
         .unwrap_or_else(|| yocto.to_string())
+}
+// ===========================================
+
+fn format_json_for_display(json_str: &str) -> String {
+    // Try to parse and pretty-print JSON, fallback to raw string
+    if let Ok(value) = serde_json::from_str::<serde_json::Value>(json_str) {
+        serde_json::to_string_pretty(&value).unwrap_or_else(|_| json_str.to_string())
+    } else {
+        // Truncate if too long for Discord message
+        if json_str.len() > 1000 {
+            format!("{}...", &json_str[..1000])
+        } else {
+            json_str.to_string()
+        }
+    }
 }
 // ===========================================
