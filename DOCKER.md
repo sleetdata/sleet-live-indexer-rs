@@ -10,6 +10,7 @@ cd sleet-live-indexer-rs
 # 2. Copy and configure environment
 cp .env.example .env
 # Edit .env and set your webhook URLs
+source .env
 
 # 3. Build and start both services
 docker compose up -d --build
