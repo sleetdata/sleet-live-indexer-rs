@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  blackjack:
+    build: .
+    container_name: sleet-blackjack
+    restart: unless-stopped
+    environment:
+      - NEAR_STREAM_URL=${NEAR_STREAM_URL:-http://host.docker.internal:8080}
+      - DISCORD_WEBHOOK_URL_BLACKJACK=${DISCORD_WEBHOOK_URL_BLACKJACK}
+    volumes:
+      - ./temp:/app/temp
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  deleteaccount:
+    build: .
+    container_name: sleet-deleteaccount
+    restart: unless-stopped
+    environment:
+      - NEAR_STREAM_URL=${NEAR_STREAM_URL:-http://host.docker.internal:8080}
+      - DISCORD_WEBHOOK_URL_DELETEACCOUNT=${DISCORD_WEBHOOK_URL_DELETEACCOUNT}
+    volumes:
+      - ./temp:/app/temp
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
