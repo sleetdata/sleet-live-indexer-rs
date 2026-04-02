@@ -13,8 +13,8 @@ near-primitives = "0.24.0"
 # SSE client
 eventsource-client = "0.13"
 tokio-stream = "0.1.18"
-# HTTP client
-reqwest = { version = "0.12", features = ["json"] }
+# HTTP client (use rustls instead of OpenSSL)
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
 # Base64 decoding for transaction args
 base64 = "0.22"
 # Timestamps for error logging
