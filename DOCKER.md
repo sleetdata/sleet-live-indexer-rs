@@ -14,10 +14,9 @@ cp .env.docker .env
 # 2b. Option B: For shell sourcing (export format)
 cp .env.example .env
 # Edit .env and set your webhook URLs
-source .env  # For running binaries locally
-```
-
-Docker Compose automatically reads `.env` from the project directory.
+# For running binaries locally
+source .env
+# Docker Compose automatically reads `.env` from the project directory.
 
 # 3. Build and start both services
 docker compose up -d --build
