@@ -1,5 +1,5 @@
 # sleet-live-indexer
-indexer playground built on near-stream
+indexer playground built around near-stream
 
 🚧 WIP
 
